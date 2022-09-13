@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-void findPrimeNum(int* randNum);
+void findPrimeNum(int* randNum, int* thereIsPrime);
 
 int main(void)
 {
 	int i;
 	int randNum[10];
+	int thereIsPrime = 0;
 
 	srand((unsigned int)time(NULL));
 	for (i = 0; i < 10; i++)
@@ -17,17 +18,20 @@ int main(void)
 	}
 
 	printf("\n\n");
-	findPrimeNum(randNum);
+	findPrimeNum(randNum, &thereIsPrime);
+	if (thereIsPrime != 1)
+		printf("There is not Prime.");
 	printf("\n\n");
 	system("pause");
 
 	return 0;
 }
 
-void findPrimeNum(int* randNum)
+void findPrimeNum(int* randNum, int* thereIsPrime)
 {
 	int i, j;
 	int cnt;
+	
 	for (i = 0; i < 10; i++)
 	{
 		cnt = 0;
@@ -41,9 +45,15 @@ void findPrimeNum(int* randNum)
 			else
 				continue;
 		}
+
 		if (cnt == 0)
 		{
-			printf("PrimeNumber[%d]: %d\n", i + 1, randNum[i]);
+			if (randNum[i] != 1)
+			{
+				printf("PrimeNumber[%d]: %d\n", i + 1, randNum[i]);
+				*thereIsPrime = 1;
+			}
 		}
+	
 	}
 }
