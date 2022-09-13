@@ -1,0 +1,82 @@
+/*prime number의 공통 특성: 
+1) 1과 자기 자신이 약수이다.
+2)  
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+typedef struct Num
+{
+	int pos = 0;
+
+}Num;
+
+void findPrimeNum(int* randNum, int* thereIsPrime, Num* PrimeNum);
+void calculate(Num* PrimeNum);
+
+int main(void)
+{
+	int i;
+	int randNum[10];
+	int thereIsPrime = 0;
+	Num* PrimeNum;
+
+	srand((unsigned int)time(NULL));
+	for (i = 0; i < 10; i++)
+	{
+		randNum[i] = (rand() % 100 + 1);
+		printf("randNume[%d]: %d\n", i + 1, randNum[i]);
+	}
+
+	printf("\n\n");
+	findPrimeNum(randNum, &thereIsPrime, PrimeNum);
+	if (thereIsPrime != 1)
+		printf("There is not Prime.");
+	printf("\n\n");
+	calculate(PrimeNum);
+	printf("\n\n");
+	system("pause");
+
+	return 0;
+}
+
+void findPrimeNum(int* randNum, int* thereIsPrime, Num* PrimeNum)
+{
+	int i, j;
+	int cnt;
+	
+	for (i = 0; i < 10; i++)
+	{
+		cnt = 0;
+		for (j = 2; j*j < randNum[i] + 1; j++)
+		{
+			if (randNum[i] % j == 0)
+			{
+				cnt++;
+				break;
+			}
+			else
+				continue;
+		}
+
+		if (cnt == 0)
+		{
+			if (randNum[i] != 1)
+			{
+				printf("PrimeNumber[%d]: %d\n", i + 1, randNum[i]); 
+				PrimeNum = (Num*)malloc(sizeof(Num));
+				*thereIsPrime = 1;
+			}
+		}
+	
+	}
+}
+
+// 찾은 소수들의 평균, 분산, 표준편차를 계산하되, 단일 함수로 구현.
+// 구조체를 이용한다.
+void calculate(Num* PrimeNum)
+{
+	double avg, variance, stdDevi;
+
+}
