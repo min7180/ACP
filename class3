@@ -2,25 +2,26 @@
 #include <stdlib.h>
 #include <time.h>
 
-void GetPrimeNumber(int* ran, int* prime, int* pn);
+void GetPrimeNumber(int* ran, int* prime, int* pn, int* isntPrime);
 
 int main(void)
 {
 	int ran[20], prime[20];
 	int pn = 0;
 	int i = 0;
+	int isPrime = 0;
 
-	GetPrimeNumber(ran, prime, &pn);
-	for (; i < 20; i++)
-		printf("%d\n", ran[i]);
+	GetPrimeNumber(ran, prime, &pn, &isPrime);
+	for (; i < pn; i++)
+		printf("%d\n", prime[i]);
 
 	return 0;
 }
 
-void GetPrimeNumber(int* ran, int* prime, int* pn)
+void GetPrimeNumber(int* ran, int* prime, int* pn, int* isPrime) // 매개변수 내에서의 *는 주소변수임을 나타내고, 코드 내의 *는 간접 참조이다. 
 {
 	int i, div;
-	srand((unsigned int)time(NULL));
+	srand((unsigned int)time(NULL));//????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
 	for (i = 0; i < 20; i++)
 	{
@@ -29,8 +30,14 @@ void GetPrimeNumber(int* ran, int* prime, int* pn)
 	for (i = 0; i < 20; i++)
 	{
 		for (div = 2; div*div < (ran[i]) + 1; div++)
-			if (ran[i] % div == 0) break;
-		prime[(*pn)++] = ran[i];
+		{
+			if (ran[i] % div == 0)
+				break;
+			else
+				isPrime = 1;
+		}
+		 if (isPrime)
+			 prime[(*pn)++] = ran[i];
 	}
 
 }
