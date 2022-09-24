@@ -1,0 +1,122 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void GetComMes(int* ran, int* n, int* commes, int* commesnum);
+void GetComMul(int* ran, int* n, int* commul, int* commulnum);
+
+int main(void)
+{ 
+	int n, i, commesnum, commulnum;
+	int ran[4], commes[6], commul[3];
+	srand((unsigned int)time(NULL));
+
+	n = (rand() % 3) + 2; // 난수의 개수를 입력받는다. 2,3,4 중 하나이다. 
+
+	// 난수 생성기로 ran배열에 수를 n만큼 넣는다. 들어가는 수는 1~200내이다. 
+	printf("생성되는 난수를 출력합니다.\n");
+	for (i = 0; i < n; i++) 
+	{
+		ran[i] = (rand() % 200) + 1; 
+		printf("ran[%d]: %d ", i, ran[i]);
+	}
+	printf("\n");
+	
+	GetComMes(ran, &n, commes, &commesnum);
+	// 공약수 배열을 이용하여, 세 개 이하의 공약수를 출력한다. 
+	printf("공약수를 출력합니다. \n");
+	commesnum += 1;
+	for (i = 0; i < commesnum; i++)
+	{
+		printf("%d\n", commes[i]);
+	}
+
+	
+	GetComMul(ran, &n, commul, &commulnum);
+	// 공배수 배열을 이용하여, 세 개 이하의 공배수를 출력한다. 
+	printf("공배수를 출력합니다. \n");
+	commulnum += 1;
+	for (i = 0; i < commulnum; i++)
+	{
+		printf("%d\n", commul[i]);
+	}
+
+	return 0;
+}
+
+void GetComMes(int* ran, int* n, int* commes, int* commesnum) // 공약수를 찾는다.  
+{
+	int min, half, div, i, cnt;
+
+	min = ran[0]; // 최솟값 찾기 
+	for (i = 0; i < *n; i++) 
+	{
+		if (min > ran[i]) min = ran[i]; 
+	}
+
+	for (cnt = i = 0; i < *n; i++) // 최솟값이 공약수가 되는지 검사하기 
+	{
+		if (ran[i] % min == 0) cnt++;
+		else break;
+	}
+
+	if (cnt == *n)
+	{
+		commes[(*commesnum)++] = min;
+	}
+	else
+		*commesnum = -1;
+
+	half = min / 2 + 1;
+	for (div = min/2 +1; div > 1; div--)
+	{
+		for (cnt = i = 0; i < *n; i++)
+			if (ran[i] % div == 0) cnt++;
+			else break;
+		// 안쪽의 for문을 나오는 경우가 두 가지이다. 하나는 div가 공약수일 때(cnt : n),
+		// 하나는 ran배열의 어느 한 숫자가 div에 의해 나눠지지 않을 때(cnt < n).
+		if (cnt == *n)
+		{
+			if ((*commesnum) == 2) break;
+			else commes[++(*commesnum)] = div; // 
+		}
+	}
+
+	if ((*commesnum) < 2) // 1보다 큰 공약수의 개수가 3개 미만인 경우
+	{
+		commes[++(*commesnum)] = 1;
+	}
+}
+
+void GetComMul(int* ran, int* n, int* commul, int* commulnum) // 공배수를 찾는다. 
+{
+	int max, i, cnt, temp ;
+
+	//최댓값 찾기 
+	max = ran[0];
+	for (i = 0; i < *n; i++)
+	{
+		if (max < ran[i]) max = ran[i];
+	}
+
+	(*commulnum) = -1;
+	temp = max;
+	while ((*commulnum) + 1 < 3)
+	{
+		for (cnt = i = 0; i < *n; i++)
+		{
+			if (temp % ran[i] == 0) cnt++;
+			else break;
+		}
+		//max를 ran의 모든 수가 나누면 공배수 배열에 들어간다.
+		//그렇지 않으면 for문을 나와서 max 만큼 늘린다. 
+
+		// for문을 나오는 경우는 두 가지이다.
+		// 하나는 temp에 들어있는 수가 최소공배수일 때(cnt : n)
+		// 다른 하나는 else문을 시행했을 때.
+		if (cnt == *n)
+			commul[++(*commulnum)] = temp;
+
+		temp += max; 
+	}
+}
