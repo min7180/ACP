@@ -1,0 +1,262 @@
+#include <stdio.h>
+#include <math.h>
+
+void main()
+{
+	double A[5][5], B[10][10], pivot, tmp, Scalar, eps = 0.000000000000001, PivotV[5], Det, min;
+	int r, c, Row, Col, CurR, CurC, PivotR, InterC = 0, Rank = 0, e = 1;
+	char PivotC[5];
+
+	printf("행렬의 행수와 열수 입력(5이하의 자연수): ");
+	scanf_s("%d %d", &Row, &Col);
+	printf("행렬의 요소 입력\n");
+	for (r = 0; r < Row; r++)
+	{
+		for (c = 0; c < Col; c++)
+		{
+			printf("(%d, %d) element of A: ", r + 1, c + 1);
+			scanf_s("%lf", &A[r][c]);
+		}
+	}
+
+	min = Row > Col ? Row : Col;
+
+	printf("행렬 A 출력\n");
+	for (r = 0; r < Row; r++)
+	{
+		for (c = 0; c < Col; c++)
+		{
+			printf("%.3f ", A[r][c]);
+		}
+		printf("\n");
+	}
+
+	for (c = 0; c < Col; c++)
+	{
+		PivotC[c] = 'n';
+	}
+
+	CurR = 0;
+	for (CurC = 0; CurC < Col; CurC++)
+	{
+		pivot = A[CurR][CurC];
+		if (fabs(pivot) < eps)
+		{
+			for (PivotR = CurR + 1; PivotR < Row; PivotR++)
+			{
+				pivot = A[PivotR][CurC];
+				if (fabs(pivot) < eps)continue;
+				//perform row interchange
+				for (c = 0; c < Col; c++)
+				{
+					tmp = A[CurR][c];
+					A[CurR][c] = A[PivotR][c];
+					A[PivotR][c] = tmp;
+				}
+				break;
+			}
+
+			if (PivotR == Row)
+			{
+				//current column is not a pivot column
+				continue; //가장 바깥 for문에 대한 continue; 
+			}
+			PivotR = CurR;
+			InterC++; // 역행렬을 구할 때 필요 
+		}
+
+		else
+		{
+			PivotR = CurR; //CurR: 0 
+		}
+
+		PivotC[CurC] = 'y'; // 여기까지 오면 추축열이므로 // 추축열인지 판단하는 곳에서 차이가 발생
+		PivotV[CurC] = pivot;
+		Rank++;
+
+		//perform replacement operation to eliminate nonzero element below pivot position
+
+		for (c = CurC; c < Col; c++)
+		{
+			A[PivotR][c] /= pivot; // 추축원소가 어차피 0이 아니므로.
+		}
+		for (r = PivotR + 1; r < Row; r++)
+		{
+			tmp = A[r][CurC];
+			if (tmp != 0.)
+			{
+				for (c = CurC; c < Col; c++)
+				{
+					A[r][c] += A[PivotR][c] * (-tmp);
+				}
+			}
+		}
+
+		for (r = 0; r < PivotR; r++)
+		{
+			tmp = A[r][CurC];
+			if (tmp != 0.)
+			{
+				for (c = CurC; c < Col; c++)
+				{
+					A[r][c] += A[PivotR][c] * (-tmp);
+				}
+			}
+		}
+
+
+		if ((CurR += 1) == Row)break;  // CurR 하나 증가시키고, 그게 행의 수와 같으면 break;
+
+		printf("사다리꼴 행렬 출력\n");
+		for (r = 0; r < Row; r++)
+		{
+			for (c = 0; c < Col; c++)
+			{
+				printf("%.3f ", A[r][c]);
+			}
+			printf("\n");
+		}
+
+	}
+
+	
+
+	printf("Pivot columns are ");
+	for (c = 0; c < Col; c++)
+	{
+		if (PivotC[c] == 'y')
+		{
+			printf("%d", c + 1);
+		}
+	}
+	printf("\n");
+	printf("Rank of A is %d\n", Rank);
+	printf("# of performing interchange is \n", InterC);
+
+	//printf("Determinant of A is ", Det); // 행렬식: 사다리꼴 추축원소들의 곱에 InterC가 홀/짝인지 확인해서 곱하면 됨 
+
+	// 역행렬 구하기
+	// 정방행렬인지, 그 중에서도 가역적인지 검사 
+
+	printf("정방행렬인지 확인합니다.");
+	if (Row == Col);
+	else
+	{
+		printf("주어진 행렬은 정방행렬이 아닙니다. 역행렬을 구할 수 없습니다.");
+		return;
+	}
+	printf("가역행렬인지 확인합니다.");
+	if (Rank == min);
+	else
+	{
+		printf("주어진 행렬은 특이행렬입니다. 역행렬을 구할 수 없습니다.");
+		return;
+	}
+
+	// 1. 첨가행렬 만들기
+	for (r = 0; r < Row * 2; r++)
+	{
+		for (c = 0; c < Col; c++)
+		{
+			B[r][c] = A[r][c];
+		}
+
+		B[r][c + e] = 1;
+
+		for (; c < Col * 2; c++)
+		{
+			B[r][c] = 0;
+		}
+		e++;
+	}
+
+	// 2. 이 첨가행렬에 대한 rref(기약 사다리꼴 행렬 만들기) 
+	for (c = 0; c < Col; c++)
+	{
+		PivotC[c] = 'n';
+	}
+
+	CurR = 0;
+	for (CurC = 0; CurC < Col; CurC++)
+	{
+		pivot = A[CurR][CurC];
+		if (fabs(pivot) < eps)
+		{
+			for (PivotR = CurR + 1; PivotR < Row; PivotR++)
+			{
+				pivot = A[PivotR][CurC];
+				if (fabs(pivot) < eps)continue;
+				//perform row interchange
+				for (c = 0; c < Col; c++)
+				{
+					tmp = A[CurR][c];
+					A[CurR][c] = A[PivotR][c];
+					A[PivotR][c] = tmp;
+				}
+				break;
+			}
+
+			if (PivotR == Row)
+			{
+				//current column is not a pivot column
+				continue; //가장 바깥 for문에 대한 continue; 
+			}
+			PivotR = CurR;
+			InterC++; // 역행렬을 구할 때 필요 
+		}
+
+		else
+		{
+			PivotR = CurR; //CurR: 0 
+		}
+
+		PivotC[CurC] = 'y'; // 여기까지 오면 추축열이므로 // 추축열인지 판단하는 곳에서 차이가 발생
+		PivotV[CurC] = pivot;
+		Rank++;
+
+		//perform replacement operation to eliminate nonzero element below pivot position
+
+		for (c = CurC; c < Col; c++)
+		{
+			A[PivotR][c] /= pivot; // 추축원소가 어차피 0이 아니므로.
+		}
+		for (r = PivotR + 1; r < Row; r++)
+		{
+			tmp = A[r][CurC];
+			if (tmp != 0.)
+			{
+				for (c = CurC; c < Col; c++)
+				{
+					A[r][c] += A[PivotR][c] * (-tmp);
+				}
+			}
+		}
+
+		for (r = 0; r < PivotR; r++)
+		{
+			tmp = A[r][CurC];
+			if (tmp != 0.)
+			{
+				for (c = CurC; c < Col; c++)
+				{
+					A[r][c] += A[PivotR][c] * (-tmp);
+				}
+			}
+		}
+
+
+		if ((CurR += 1) == Row)break;  // CurR 하나 증가시키고, 그게 행의 수와 같으면 break;
+
+	}
+
+	printf("역행렬 출력\n");
+	for (r = 0; r < Row * 2; r++)
+	{
+	
+		for ( c = Col; c < Col * 2; c++)
+		{
+			printf("%.3lf\t", B[r][c]);
+		}
+		printf("\n");
+	}
+}
