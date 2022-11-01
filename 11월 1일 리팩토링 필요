@@ -1,0 +1,334 @@
+#include <stdio.h>
+#include <math.h>
+#define EPS 0.000000000000000000000001
+
+void userInputElement(double(*matrix1)[5], double(*matrix2)[5], int* row_adr, int* col_adr);
+void printOriginMatrix(double(*matrix)[5], int* row_adr, int* col_adr);
+void transMatrix(double(*matrix)[5], int* row_adr, int* col_adr);
+void printofTransMatrix(double(*matrix)[5], int* row_adr, int* col_adr);
+void mulofMatrix(double(*matrix1)[5], double(*matrix2)[5], double(*result1)[5], double(*result3)[5], double(*matrix3)[10], int* mat1RowAdr, int* mat2ColAdr, int* mat1ColAdr);
+void printofMulMatrix(double(*result)[5], int* row_adr, int* col_adr); 
+void printAugmentedMatrix(double(*matrix)[10], int* row_adr, int* col_adr); 
+void printInverseMatrix(double(*matrix)[10], int* row_adr, int* col_adr);
+
+int main() {
+	// A is origin, AT is transpose, B is augmented
+	double A[5][5], AT[5][5], Result1[5][5] = { 0 }, Result2[5][5] = { 0 }, Result3[5][5] = { 0 }, B[5][10] = { 0 }, pivot, tmp, det = 1, pivotValof1[5], pivotValofB[5], replaceRowof1[5], replaceRowofB[5];
+	int pivot_i, min, row_i, col_i, row, col, curRow, curCol, pivotRow, numofInterchange = 0, rank = 0;
+	int i, j, k;
+	char pivotColof1[5], pivotColofB[10];
+
+	printf("행렬의 행수와 열수 입력(5이하로)\n");
+	printf("A of rows--> ");
+	scanf_s("%d", &row);
+	printf("A of cols--> ");
+	scanf_s("%d", &col);
+	printf("행렬의 요소 입력\n");
+	userInputElement(A, AT, &row, &col);
+	printf("\n\n");
+
+	min = row > col ? row : col;
+
+	printf("행렬 A 출력\n");
+	printOriginMatrix(A, &row, &col);
+	printf("\n\n");
+
+	transMatrix(AT, &row, &col);
+	printf("행렬 A의 전치행렬 AT 출력\n");
+	printofTransMatrix(AT, &row, &col);
+	printf("\n\n");
+
+	mulofMatrix(A, AT, Result1, Result3, B, &row, &row, &col);
+	printf("행렬 A와 전치행렬 AT의 곱셈결과 출력\n");
+	printofMulMatrix(Result1, &row, &col);
+
+	// [AAT I] 구하기
+	for (row_i = 0; row_i < row; row_i++) {
+		for (col_i = row; col_i < row * 2; col_i++) {
+			if ((row_i + row) == col_i) B[row_i][col_i] = 1;
+			else B[row_i][col_i] = 0;
+		}
+	}
+	printf("The augmented matrix of [AAT I]\n");
+	printAugmentedMatrix(B, &row, &col);
+	printf("\n\n");
+
+
+	//AAT인 Result1의 사다리꼴 행렬 만들기
+	for (col_i = 0; col_i < col; col_i++) {
+		pivotColof1[col_i] = 'n';
+	}
+
+	curRow = 0;
+	for (curCol = 0; curCol < col; curCol++) {
+		pivot = Result1[curRow][curCol];
+
+		if (fabs(pivot) < EPS) {
+			for (pivotRow = curRow + 1; pivotRow < row; pivotRow++) {
+				pivot = Result1[pivotRow][curCol];
+				if (fabs(pivot) < EPS)continue;
+				for (col_i = 0; col_i < col; col_i++) {
+					tmp = Result1[curRow][col_i];
+					Result1[curRow][col_i] = Result1[pivotRow][col_i];
+					Result1[pivotRow][col_i] = tmp;
+				}
+				pivot = Result1[curRow][0];
+				numofInterchange++;
+				break;
+			}
+
+			if (pivotRow == row) {
+				continue;
+			}
+			pivotRow = curRow;
+		}
+		else {
+			pivotRow = curRow;
+		}
+
+		pivotColof1[curCol] = 'y';
+		pivotValof1[curCol] = pivot;
+		rank++;
+
+		for (col_i = curCol; col_i < col; col_i++) {
+			replaceRowof1[col_i] = Result1[pivotRow][col_i] / pivot;
+		}
+		for (row_i = pivotRow + 1; row_i < row; row_i++) {
+			tmp = Result1[row_i][curCol];
+			if (fabs(tmp) > EPS) {
+				for (col_i = curCol; col_i < col; col_i++) {
+					Result1[row_i][col_i] += replaceRowof1[col_i] * (-tmp);
+				}
+			}
+		}
+		if ((curRow += 1) == row) break;
+	}
+	// AAT가 행렬이 정방행렬인지, 그 중에서도 가역적인지 검사
+	printf("정방행렬인지 확인합니다. :");
+	if (row == col) printf("정방행렬입니다.\n");
+	else {
+		printf("이 행렬은 정방행렬이 아닙니다. 행렬식은 0이고, 역행렬을 구할 수 없습니다.\n ");
+		return 0;
+	}
+	printf("가역행렬인지 확인합니다. :");
+	if (rank == min)printf("가역행렬입니다.\n\n");
+	else {
+		printf("이 행렬은 특이행렬입니다. 행렬식은 0이며, 역행렬을 구할 수 없습니다.\n\n");
+		return 0;
+	}
+
+	// AAT의 행렬식 구하기
+	for (pivot_i = 0; pivot_i < rank; pivot_i++) {
+		det *= pivotValof1[pivot_i];
+	}
+	if (numofInterchange % 2 == 1) det *= (-1);
+	printf("Determinant of AAT is %.3lf\n\n", det);
+
+	
+	//AAT의 역행렬 만들기
+	for (col_i = 0; col_i < col * 2; col_i++) {
+		pivotColofB[col_i] = 'n';
+	}
+
+	curRow = 0;
+	for (curCol = 0; curCol < col * 2; curCol++) {
+		pivot = B[curRow][curCol];
+
+		if (fabs(pivot) < EPS) {
+			for (pivotRow = curRow + 1; pivotRow < row; pivotRow++) {
+				pivot = B[pivotRow][curCol];
+				if (fabs(pivot) < EPS) continue;
+				for (col_i = 0; col_i < col * 2; col_i++) {
+					tmp = B[curRow][col_i];
+					B[curRow][col_i] = B[pivotRow][col_i];
+					B[pivotRow][col_i] = tmp;
+				}
+				pivot = B[curRow][0];
+				break;
+			}
+
+			if (pivotRow == row) {
+				continue;
+			}
+			pivotRow = curRow;
+		}
+		else {
+			pivotRow = curRow;
+		}
+
+		pivotColofB[curCol] = 'y';
+		pivotValofB[curCol] = pivot;
+		rank++;
+
+		for (col_i = curCol; col_i < col * 2; col_i++) {
+			replaceRowofB[col_i] = B[pivotRow][col_i] / pivot;
+		}
+		for (row_i = pivotRow + 1; row_i < row; row_i++) {
+			tmp = B[row_i][curCol];
+			if (fabs(tmp) > EPS) {
+				for (col_i = curCol; col_i < col * 2; col_i++) {
+					B[row_i][col_i] += replaceRowofB[col_i] * (-tmp);
+				}
+			}
+		}
+		if ((curRow += 1) == row) break;
+	}
+
+	curRow = row - 1;
+	for (curCol = col * 2 - 1; curCol > -1; curCol--) {
+		if (pivotColofB[curCol] == 'n') continue;
+
+		while (1) {
+			if (fabs(B[curRow][curCol]) < EPS) {
+				curRow--;
+			}
+			if (B[curRow][curCol] == 1) break;
+			else {
+				tmp = B[curRow][curCol];
+				for (col_i = curCol; col_i < col * 2; col_i++) {
+					if (fabs(B[curRow][col_i]) < EPS) continue;
+					B[curRow][col_i] = B[curRow][col_i] / tmp;
+				}
+				break;
+			}
+		}
+
+		for (row_i = curRow - 1; row_i > -1; row_i--) {
+			tmp = (-1) * B[row_i][curCol];
+			if (fabs(tmp) > EPS) {
+				for (col_i = curCol; col_i < col * 2; col_i++) {
+					if (fabs(B[curRow][col_i]) < EPS) continue;
+					B[row_i][col_i] += B[curRow][col_i] * tmp;
+				}
+			}
+		}
+		curRow--;
+	}
+
+	printf("Inverse of AAT\n");
+	printInverseMatrix(B, &row, &col);
+	printf("\n");
+
+	//proof of inverse of AAT
+	for (i = 0; i < row; i++) {
+		for (j = 0; j < row; j++) {
+			for (k = 0; k < row; k++) {
+				Result2[i][j] += Result3[i][k] * B[k][j + row];
+			}
+		}
+	}
+
+	printf("Proof of AAT\n");
+	for (i = 0; i < row; i++) {
+		for (j = 0; j < row; j++) {
+			printf("%.3lf ", Result2[i][j]);
+		}
+		printf("\n");
+	}
+
+
+}
+
+void userInputElement(double(*matrix1)[5], double(*matrix2)[5], int* row_adr, int* col_adr) {
+	
+	int row_i, col_i;
+
+	for (row_i = 0; row_i < *(row_adr); row_i++) {
+		for (col_i = 0; col_i < *(col_adr); col_i++) {
+			printf("(%d, %d)th element of A--> ", row_i + 1, col_i + 1);
+			scanf_s("%lf", &matrix1[row_i][col_i]);
+			matrix2[row_i][col_i] = matrix1[row_i][col_i];
+		}
+	}
+}
+
+void printOriginMatrix(double(*matrix)[5], int* row_adr, int* col_adr) {
+	
+	int row_i, col_i;
+
+	for (row_i = 0; row_i < *(row_adr); row_i++) {
+		for (col_i = 0; col_i < *(col_adr); col_i++) {
+			printf("%.3lf ", matrix[row_i][col_i]);
+		}
+		printf("\n");
+	}
+}
+
+void transMatrix(double(*matrix)[5], int* row_adr, int* col_adr) {
+
+	int i, j, temp;
+	char trans[5][5] = { {'f','f','f','f','f'},{'f','f','f','f','f'},{'f','f','f','f','f'},{'f','f','f','f','f'},{'f','f','f','f','f'} };
+
+	for (i = 0; i < *(row_adr); i++) {
+		for (j = 0; j < *(col_adr); j++) {
+			if (i == j) continue;
+			if (trans[i][j] == 'f') {
+				temp = matrix[i][j];
+				matrix[i][j] = matrix[j][i];
+				matrix[j][i] = temp;
+			}
+		}
+	}
+}
+
+void printofTransMatrix(double(*matrix)[5], int* row_adr, int* col_adr) {
+
+	int i, j;
+
+	for (i = 0; i < *(col_adr); i++) {
+		for (j = 0; j < *(row_adr); j++) {
+			printf("%.3lf ", matrix[j][i]);
+		}
+		printf("\n");
+	}
+}
+
+void mulofMatrix(double(*matrix1)[5], double(*matrix2)[5], double(*result1)[5], double(*result3)[5], double(*matrix3)[10], int* mat1RowAdr, int* mat2ColAdr, int* mat1ColAdr) {
+	
+	int i, j, k;
+
+	for (i = 0; i < *(mat1RowAdr); i++) {
+		for (j = 0; j < *(mat2ColAdr); j++) {
+			for (k = 0; k < *(mat1ColAdr); k++) {
+				result1[i][j] += matrix1[i][k] * matrix2[k][j];
+				result3[i][j] = matrix3[i][j] = result1[i][j];
+			}
+		}
+	}
+}
+
+void printofMulMatrix(double(*result)[5], int* row_adr, int* col_adr) {
+
+	int i, j;
+
+	for (i = 0; i < *(row_adr); i++) {
+		for (j = 0; j < *(row_adr); j++) {
+			printf("%.3lf ", result[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+void printAugmentedMatrix(double(*matrix)[10], int* row_adr, int* col_adr) {
+
+	int row_i, col_i;
+
+	for (row_i = 0; row_i < *(row_adr); row_i++) {
+		for (col_i = 0; col_i < *(row_adr) * 2; col_i++) {
+			printf("%.3lf ", matrix[row_i][col_i]);
+		}
+		printf("\n");
+	}
+}
+
+void printInverseMatrix(double(*matrix)[10], int* row_adr, int* col_adr) {
+
+	int row_i, col_i;
+
+	for (row_i = 0; row_i < *(row_adr); row_i++) {
+		for (col_i = *(col_adr); col_i < *(col_adr) * 2; col_i++) {
+			printf("%.3lf ", matrix[row_i][col_i]);
+		}
+		printf("\n");
+	}
+}
