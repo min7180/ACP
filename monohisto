@@ -1,0 +1,93 @@
+//첫 번째 소스코드는 어떠한 크기의 흑백영상이든 다 작동한다. 히스토그램의 빈의 개수도 자유롭게 설정할 수 있다. 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+typedef unsigned char BYTE;
+
+void main() {
+
+	char fname[50];
+	int* freq = NULL, Row, Col, i, k, BinN, Range, LowB, UpperB, Size;
+	BYTE* img = NULL;
+	double temp;
+	FILE* in = NULL;
+
+	puts("오픈할 바이너리 파일명을 50자 미만으로 입력하고 엔터키를 누르세요.");
+	gets_s(fname, 50);
+	if (fopen_s(&in, fname, "rb") != 0) exit(0);
+	printf("Key in the number of rows of %s-->", fname);
+	scanf_s("%d", &Row);
+	printf("Key in the number of columns of %s-->", fname);
+	scanf_s("%d", &Col);
+
+	Size = Row * Col;
+	img = (BYTE*)malloc(sizeof(BYTE) * Size);
+	fread(img, Row * Col, 1, in);
+	fclose(in);
+
+	printf("밝기값 빈도 분포의 빈의 크기를 입력하시오 -->");
+	scanf_s("%d", &Range);
+	temp = 256.0 / Range;
+	BinN = (int)temp;
+
+	if ((temp - BinN) > 0.0) BinN++;
+	freq = (int*)malloc(sizeof(int) * BinN);
+	for (k = 0; k < BinN; k++) *(freq + k) = 0;
+
+	//밝기 빈도 조사
+	for (i = 0; i < Size; i++) {
+		for (LowB = k = 0; k < BinN; k++, LowB = UpperB) {
+			UpperB = LowB + Range;
+			if (img[i] >= LowB && img[i] < UpperB) {
+				freq[k]++;
+				break;
+			}
+		}
+	}
+
+	//밝기 빈도 출력
+	printf("빈 번호 빈도\n");
+	for (k = 0; k < BinN; k++) {
+		printf("Bin %2d: %d\n", k + 1, freq[k]);
+	}
+	free(freq);
+	free(img);
+}
+
+
+/*#include <stdio.h>
+#include <stdlib.h>
+typedef unsigned char BYTE;
+void main() {
+
+	FILE* in = NULL;
+	BYTE* Img = NULL;
+	int row, col, Row, Col, Size, pos, histo[256] = { 0 };
+	char filename[20];
+	puts("Enter image file name to read --> ");
+	gets_s(filename, sizeof(filename));
+	puts(filename);
+	fopen_s(&in, filename, "rb");
+
+	if (in == NULL) {
+		fprintf(stderr, "Error opening file %s.", filename);
+		exit(0);
+	}
+
+	printf("Key in the number of rows of %s--> ", filename);
+	scanf_s("%d", &Row);
+	printf("Key in the number of columns of %s--> ", filename);
+	scanf_s("%d", &Col);
+	Size = Row * Col;
+	Img = (BYTE*)malloc(sizeof(BYTE) * Size);
+	fread(Img, Size, 1, in);
+	fclose(in); 
+
+	for (row = 0; row < Row; row++) {
+		for (pos = row * Col, col = 0; col < Col; col++) {
+			histo[*(Img + pos + col)]++;
+		}
+	}
+
+	free(Img);
+}*/
