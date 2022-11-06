@@ -1,0 +1,24 @@
+/*#include <stdio.h>
+#include <stdlib.h>
+typedef unsigned char BYTE;
+
+void main() {
+
+	FILE* in = NULL;
+	BYTE* img = NULL;
+	int Row, Col, Col3, Size;
+
+	fopen_s(&in, "test.raw", "rb");
+	if (in == NULL) {
+		fprintf(stderr, "Error opening file.");
+		exit(0);
+	}
+
+	Row = 1080; Col = 1920;
+	Col3 = Col * 3;
+	Size = Row * Col3;
+	img = (BYTE*)malloc(sizeof(BYTE) * Size);
+	fread(img, Size, 1, in);
+	fclose(in);
+	free(img);
+}*/
