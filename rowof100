@@ -1,0 +1,37 @@
+/*#include <stdio.h>
+#include <stdlib.h>
+
+void main() {
+
+	int Col, Row, Size, row, col, RowStart, RowEnd;
+	FILE* in = NULL;
+	char filename[20];
+	unsigned char* Norm;
+	printf("읽을 파일명 입력--> ");
+	gets_s(filename, sizeof(filename));
+	puts(filename);
+
+	fopen_s(&in, filename, "rb");
+	if (in == NULL) {
+		fprintf(stderr, "Error opening file %s.", filename);
+		exit(0);
+	}
+
+	printf("파일 수직(row), 수평(col)의 크기: ");
+	scanf_s("%d %d", &Row, &Col);
+
+	printf("%s의 몇 번째 행부터 읽을 것인가? ", filename);
+	while (RowStart < 1 || RowStart > Row) {
+		printf("%s의 몇 번째 행부터 읽을 것인가? ", filename);
+		scanf_s("%d", &RowStart);
+	}
+
+	Size = (RowStart - 1) * Col;
+	fseek(in, Size, 0); // 시작점에서 Size만큼 점프// 이 코드가 짱 중요!! 그래야 34번 줄에서 지정된 행에서부터 저장이 되지!
+
+	Size = Row * Col - Size; // 원본 사이즈값에서 지금 시작값을 빼야, 그만큼만 저장하자나. 
+	Norm = (unsigned char*)malloc(sizeof(unsigned char) * Size);
+	fread(Norm, Size, 1, in);
+	fclose(in);
+	free(Norm);
+}*/
