@@ -1,0 +1,46 @@
+// 기존 파일을 Img에 저장하고 이용하는 프로그램 
+/*#include <stdio.h>
+#include <stdlib.h>
+typedef unsigned char BYTE;
+void main() {
+
+	FILE* in = NULL, * out = NULL;
+	BYTE val, Img[240][320];
+	int row, col;
+	char filename[20];
+	puts("Enter image file name to read: "); // 문자열만을 출력하는 함수. 문자열 출력 후 줄 바꿈을 한다.
+	gets_s(filename, sizeof(filename));
+	puts(filename);
+	fopen_s(&in, filename, "rb");
+
+	if (in == NULL) {
+		fprintf(stderr, "Error opening file %s.", filename);
+		exit(0);
+	}
+
+	for (row = 0; row < 240; row++) {
+		for (col = 0; col < 320; col++) {
+			//fread(&val, 1, 1, in); // in의 데이터를 val에다가 한 픽셀씩 읽어들인다.
+			//Img[row][col] = val; printf("%x(%d)", val, val); 
+			// 방금 읽어들인 한 픽셀을 Img의 한 성분에 저장, val의 값을 16진수(10진수)로 출력
+			fread(&Img[row][col], 1, 1, in);
+			printf("%x", Img[row][col]);
+		}
+	}
+
+	fclose(in);
+
+	puts("Enter image file name to write: ");
+	gets_s(filename, sizeof(filename));
+	puts(filename);
+	fopen_s(&out, filename, "wb");
+	if (out == NULL) exit(0);
+	for (row = 0; row < 240; row++) {
+		for (col = 0; col < 320; col++) {
+			fwrite(&Img[row][col], 1, 1, out);
+		}
+	}
+
+	fclose(out);
+	
+}*/
