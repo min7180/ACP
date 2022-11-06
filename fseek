@@ -1,0 +1,39 @@
+/*#include <stdio.h>
+#include <stdlib.h>
+
+void main() {
+
+	FILE* in = NULL;
+	unsigned char val;
+	int i;
+
+	fopen_s(&in, "data.txt", "r"); . 
+	if (in == NULL) {
+		printf("open 실패\n");
+		exit(0);
+	}
+
+	fseek(in, 20, 0); // 시작점에서 20바이트 뜀 
+	
+	for (i = 0; i < 10; i++) {
+		fread(&val, 1, 1, in);
+		printf("%c ", val);
+	}
+	puts("");
+
+	fseek(in, 10, 1); // 현재 위치에서 10바이트 뜀 
+	for (i = 0; i < 10; i++) {
+		fread(&val, 1, 1, in);
+		printf("%c ", val);
+	}
+	puts("");
+
+	fseek(in, -15, 2); // 끝에서 15바이트를 거꾸로 감
+	for (i = 0; i < 10; i++) {
+		fread(&val, 1, 1, in);
+		printf("%d ", val); 
+	}
+	puts("");
+
+	fclose(in);
+}*/
