@@ -1,0 +1,9 @@
+//opencv--> windows 다운로드 (위치는 C:\를 권장)
+//vs를 열어 새 프로젝트를 만들어준다. 프로젝트는 cpp로 만들자. 
+//새 프로젝트를 만들고 나면, 상단 목록의 프로젝트 > 프로젝트이름 속성(가장 하단) 에 들어간다.
+//상단의 구성(C): '모든 구성', 플랫폼(P): 'x64'로 설정해준다.
+//왼쪽 목록에서 C/C++ > 일반에서 '추가 포함 디렉터리'에 C:\opencv\build\include를 입력해준다. 
+//왼쪽 목록에서 링커 > 일반에서 '추가 라이브러리 디렉터리'에 C:\opencv\build\x64\vc14\lib를 입력해준다. 
+//왼쪽 목록에서 링커 > 입력에서 '추가 종속성'의 맨 앞에 opencv_world460d.lib;를 입력해준다. 
+//프로젝트명.vcxproj가 있는 곳에 opencv_videoio_ffmpeg460_64.dll 과 opencv_world460.dll 과 opencv_world460d.dll을 넣는다.
+//또 여기에 cvtest.h와 KJM과 test.raw를 넣는다. 
