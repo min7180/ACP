@@ -1,0 +1,32 @@
+int row, col, p;
+BYTE val;
+double ang, t, Norm1, Norm2;
+for (row = sR; row < eR; row++) {
+	p = m_mStart[row] + sC;
+	for (col = sC; col < eC; col++, p++) {
+		pNormSuppress[p] = 0;
+		if (!(val = pNorm[p])) continue;
+		ang = (pPhase[p] - 90.0) * A2R;
+		t = tan(ang);
+		if (t >= 0.0 && t < 1.0) {
+			Norm1 = t * pNorm[p + m_nCol + 1] + (1.0 - t) * pNorm[p + 1];
+			Norm2 = t * pNorm[p - m_nCol - 1] + (1.0 - t) * pNorm[p - 1];
+		}
+		else if (t >= 1.0) {
+			t = tan(1.570796327 - ang);
+			Norm1 = t * pNorm[p + m_nCol + 1] + (1.0 - t) * pNorm[p + m_nCol];
+			Norm2 = t * pNorm[p - m_nCol - 1] + (1.0 - t) * pNorm[p - m_nCol];
+		}
+		else if (t >= -1.0 && t < 0.0) {
+			t *= -1.0;
+			Norm1 = t * pNorm[p - m_nCol + 1] + (1.0 - t) * pNorm[p + 1];
+			Norm2 = t * pNorm[p + m_nCol - 1] + (1.0 - t) * pNorm[p - 1];
+		}
+		else {
+			t = tan(1.570796327 + ang);
+			Norm1 = t * pNorm[p - m_nCol + 1] + (1.0 - t) * pNorm[p - m_nCol];
+			Norm2 = t * pNorm[p + m_nCol - 1] + (1.0 - t) * pNorm[p + m_nCol];
+		}
+		if (val >= (BYTE)Norm1 && val >= (BYTE)Norm2) pNormSuppress[p] = val;
+	}
+}
