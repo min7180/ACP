@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <math.h>
+#define Coef 0.66754 // 225.0/382, 에지의 absx+absy이 가질 수 있는 가장 큰 값이 382이므로 이를 BYTE로 표현하기 위함
+#define NEG(X) (X) < 0 ? -((int)(X-0.5)) : ((int)(X+0.5))
+typedef unsigned char BYTE;
+
+void SobelEdgeExtract(BYTE* Img, BYTE* Norm, BYTE* Phase, int Row, int Col, BYTE AngLUT[][256], int* Start) {
+	int x, y, row, col, p, Cm1, Cp1, Rm1;
+	BYTE absx, absy, p1, p3, p4, p6;
+	Cm1 = Col - 1;
+	Cp1 = Col + 1;
+	Rm1 = Row - 1;
+
+	for (row = 1; row < Rm1; row++) {
+		p = Start[row] + 1;
+		for (col = 1; col < Cm1; col++, p++) {
+			p1 = Img[p - Cp1];
+			p3 = Img[p + Cm1];
+			p4 = Img[p + Cp1];
+			p6 = Img[p - Cm1];
+			x = (2 * (Img[p + 1] - Img[p - 1]) + p4 + p6 - p1 - p3); // gradient x
+			y = (2 * (Img[p + Col] - Img[p - Col]) + p3 + p4 - p1 - p6); // gradient y
+			absx = NEG(x * 0.25); 
+			absy = NEG(y * 0.25);
+			Norm[p] = (BYTE)((absx + absy) * Coef + 0.5);
+			if ((x < 0 && y > 0) || (x > 0 && y < 0)) Phase[p] = -AngLUT[absx][absy] + 90;
+			else Phase[p] = AngLUT[absx][absy] + 90;
+		}
+	}
+}
