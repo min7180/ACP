@@ -1,0 +1,17 @@
+#include <math.h>
+
+#define A2R 0.01745329252
+#define R2A 57.29577951308
+#define NEG(X) (X) < 0 ? -((int)((X) - 0.5)) : ((int)((X) + 0.5))
+
+int Diag ;// 선언 필요
+
+m_Hough = (unsigned int*)malloc(sizeof(int)*Size);
+for(i = 0; i < Size; i++) m_Hough[i] = 0; 
+//LUT 구축
+for(ang = 0; ang < 181; ang++) Address[ang] = ang*Length; // 1D 하프 공간 셀의 빠른 탐색을 위해
+double Cos[181], Sin[181]; // 삼각함수 LUT
+for(rad = ang = 0; ang < 181; ang++, rad = ang*A2R) {
+  Cos[ang] = cos(rad);
+  Sin[ang] = sin(rad);
+}

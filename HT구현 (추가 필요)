@@ -1,9 +1,0 @@
-#include <math.h>
-
-#define A2R 0.01745329252
-#define R2A 57.29577951308
-#define NEG(X) (X) < 0 ? -((int)((X) - 0.5)) : ((int)((X) + 0.5))
-
-int Diag, Col, Row;
-
-Diag = (int)(sqrt(Col*Col + Row * Row) + 0.5); 
